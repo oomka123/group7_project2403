@@ -36,9 +36,9 @@ public class MyApplication {
 
     private void quizMenu() {
         System.out.println();
-        System.out.println("Quiz Menu");
+        System.out.println("\n=== Quiz Menu ===");
         System.out.println("Select option:");
-        System.out.println("1. Start Quiz(not working)");
+        System.out.println("1. Start Quiz");
         System.out.println("2. Create Quiz");
         System.out.println("3. Show Quizzes");
         System.out.println("4. Delete Quizzes");
@@ -89,7 +89,6 @@ public class MyApplication {
                     case 0 -> {
                         System.out.println("\n*************************\n");
                         System.out.println("Goodbye!");
-                        System.out.println("\n*************************\n");
                         running = false;
                     }
                     default -> System.out.println("Invalid option. Please try again.");
@@ -101,12 +100,13 @@ public class MyApplication {
                 System.out.println("An error occurred: " + e.getMessage());
             }
 
-            System.out.println("*************************");
+            System.out.println("\n*************************\n");
         }
     }
 
     private void quizMenuHandler() {
         boolean inQuizMenu = true;
+        boolean printAsterisk = true;
 
         while (inQuizMenu) {
             quizMenu();
@@ -115,7 +115,7 @@ public class MyApplication {
                 int option = scanner.nextInt();
                 scanner.nextLine();
                 switch (option) {
-                    case 1 -> System.out.println("Not working");
+                    case 1 -> startQuiz();
                     case 2 -> createQuiz();
                     case 3 -> showQuizzes();
                     case 4 -> deleteQuiz();
@@ -123,9 +123,9 @@ public class MyApplication {
                     case 0 -> {
                         System.out.println("\n*************************\n");
                         System.out.println("Logging out...");
-                        System.out.println("\n*************************\n");
                         currentUser = null;
                         inQuizMenu = false;
+                        printAsterisk = false;
                     }
                     default -> System.out.println("Invalid option. Please try again.");
                 }
@@ -135,7 +135,9 @@ public class MyApplication {
             } catch (Exception e) {
                 System.out.println("An error occurred: " + e.getMessage());
             }
-            System.out.println("*************************");
+            if(printAsterisk){
+                System.out.println("\n*************************\n");
+            }
         }
     }
 
@@ -162,7 +164,7 @@ public class MyApplication {
             } catch (Exception e) {
                 System.out.println("An error occurred: " + e.getMessage());
             }
-            System.out.println("*************************");
+            System.out.println("\n*************************\n");
         }
     }
 
@@ -353,8 +355,10 @@ public class MyApplication {
 
                 List<Question> questions = questionController.getQuestionsByQuiz(quizId);
                 if (questions.isEmpty()) {
+                    System.out.println("\n*************************\n");
                     System.out.println("No questions found for this quiz.");
                 } else {
+                    System.out.println("\n*************************\n");
                     System.out.println("Questions:");
                     questions.forEach(q -> System.out.println("- " + q.getQuestionText()));
                 }
@@ -540,6 +544,124 @@ public class MyApplication {
             Question question = questions.get(i);
             System.out.println((i + 1) + ". " + question.getQuestionText());
         }
+    }
+
+    private void startQuiz() {
+        List<Quiz> quizzes = quizController.showQuizzes(currentUser.getUser_id());
+        if (quizzes.isEmpty()) {
+            System.out.println("No quizzes available.");
+            return;
+        }
+
+        System.out.println("Available Quizzes:");
+        for (int i = 0; i < quizzes.size(); i++) {
+            System.out.println((i + 1) + ". " + quizzes.get(i).getQuizName());
+        }
+
+        System.out.print("Select a quiz by number: ");
+        int quizIndex = scanner.nextInt();
+        scanner.nextLine();
+
+        if (quizIndex <= 0 || quizIndex > quizzes.size()) {
+            System.out.println("Invalid quiz number.");
+            return;
+        }
+
+        int quizId = quizzes.get(quizIndex - 1).getQuizId();
+
+        boolean restartQuiz;
+        do {
+            restartQuiz = false;
+
+            List<Question> allQuestions = questionController.getQuestionsByQuiz(quizId);
+
+            if (allQuestions.isEmpty()) {
+                System.out.println("No questions available for this quiz.");
+                return;
+            }
+
+            List<Question> questionsWithAnswers = new ArrayList<>();
+            for (Question question : allQuestions) {
+                List<Answer> answers = answerController.getAnswersByQuestion(question.getQuestionId());
+                if (!answers.isEmpty()) {
+                    questionsWithAnswers.add(question);
+                }
+            }
+
+            if (questionsWithAnswers.isEmpty()) {
+                System.out.println("No valid questions (with answers) available for this quiz.");
+                return;
+            }
+
+            Collections.shuffle(questionsWithAnswers);
+
+            int totalQuestions = questionsWithAnswers.size();
+            int correctAnswers = 0;
+
+            List<IncorrectAnswer> incorrectAnswers = new ArrayList<>();
+
+            System.out.println("Starting the quiz...");
+
+            for (int i = 0; i < totalQuestions; i++) {
+                Question question = questionsWithAnswers.get(i);
+                System.out.println("Question " + (i + 1) + ": " + question.getQuestionText());
+
+                List<Answer> answers = answerController.getAnswersByQuestion(question.getQuestionId());
+
+                Collections.shuffle(answers);
+
+                for (int j = 0; j < answers.size(); j++) {
+                    System.out.println((j + 1) + ". " + answers.get(j).getAnswerText());
+                }
+
+                System.out.print("Enter the number of your answer: ");
+                int answerIndex = scanner.nextInt();
+                scanner.nextLine();
+
+                if (answerIndex > 0 && answerIndex <= answers.size()) {
+                    Answer userAnswer = answers.get(answerIndex - 1);
+                    if (userAnswer.isCorrectAnswer()) {
+                        System.out.println("Correct!");
+                        correctAnswers++;
+                    } else {
+                        System.out.println("Wrong.");
+
+                        Answer correctAnswer = answers.stream().filter(Answer::isCorrectAnswer).findFirst().orElse(null);
+                        incorrectAnswers.add(new IncorrectAnswer(question, userAnswer, correctAnswer));
+                    }
+                } else {
+                    System.out.println("Invalid answer.");
+                }
+
+                System.out.println();
+            }
+
+            System.out.println("Quiz Finished!");
+            System.out.println("You got " + correctAnswers + " out of " + totalQuestions + " questions correct.");
+
+            if (!incorrectAnswers.isEmpty()) {
+                System.out.print("\n*************************\nWould you like to review the questions you answered incorrectly? (yes/no): ");
+                String response = scanner.nextLine().trim().toLowerCase();
+                if (response.equals("yes")) {
+                    System.out.println("Incorrectly answered questions:");
+                    for (IncorrectAnswer incorrect : incorrectAnswers) {
+                        System.out.println("Question: " + incorrect.getQuestion().getQuestionText());
+                        System.out.println("Your Answer: " + incorrect.getUserAnswer().getAnswerText());
+                        System.out.println("Correct Answer: " + (incorrect.getCorrectAnswer() != null ? incorrect.getCorrectAnswer().getAnswerText() : "No correct answer found."));
+                        System.out.println();
+                    }
+                }
+            }
+
+            System.out.print("\n*************************\nWould you like to restart this quiz? (yes/no): ");
+            String restartResponse = scanner.nextLine().trim().toLowerCase();
+            if (restartResponse.equals("yes")) {
+                restartQuiz = true;
+            }
+
+        } while (restartQuiz);
+
+        System.out.println("\n*************************\nThank you for taking the quiz!\n*************************\n");
     }
 
 }
