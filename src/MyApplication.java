@@ -1,4 +1,5 @@
 import controllers.AuthController;
+import controllers.QuestionController;
 import controllers.QuizController;
 
 import models.*;
@@ -8,13 +9,15 @@ import java.util.*;
 public class MyApplication {
     private final AuthController authController;
     private final QuizController quizController;
+    private final QuestionController questionController;
     private final Scanner scanner;
     private User currentUser;
 
-    public MyApplication(AuthController authController, QuizController quizController) {
+    public MyApplication(AuthController authController, QuizController quizController, QuestionController questionController) {
         this.scanner = new Scanner(System.in);
         this.authController = authController;
         this.quizController = quizController;
+        this.questionController = questionController;
     }
 
     private void mainMenu() {
@@ -36,7 +39,7 @@ public class MyApplication {
         System.out.println("2. Create Quiz");
         System.out.println("3. Show Quizzes");
         System.out.println("4. Delete Quizzes");
-        System.out.println("5. Manage Questions(not working)");
+        System.out.println("5. Manage Questions");
         System.out.println("0. Logout");
         System.out.println();
         System.out.print("Enter option (0-5): ");
@@ -47,12 +50,10 @@ public class MyApplication {
         System.out.println("1. View Questions");
         System.out.println("2. Add Question");
         System.out.println("3. Delete Question");
-        System.out.println("4. Manage Answers");
+        System.out.println("4. Manage Answers(not working)");
         System.out.println("0. Back");
         System.out.print("Enter your choice: ");
     }
-
-
 
     public void start() {
         boolean running = true;
@@ -105,7 +106,7 @@ public class MyApplication {
                     case 2 -> createQuiz();
                     case 3 -> showQuizzes();
                     case 4 -> deleteQuiz();
-                    case 5 -> System.out.println("Not working");
+                    case 5 -> questionMenuHandler();
                     case 0 -> {
                         System.out.println("\n*************************\n");
                         System.out.println("Logging out...");
@@ -113,6 +114,33 @@ public class MyApplication {
                         currentUser = null;
                         inQuizMenu = false;
                     }
+                    default -> System.out.println("Invalid option. Please try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Input must be an integer: " + e.getMessage());
+                scanner.next();
+            } catch (Exception e) {
+                System.out.println("An error occurred: " + e.getMessage());
+            }
+            System.out.println("*************************");
+        }
+    }
+
+    private void questionMenuHandler() {
+        boolean inQuestionMenu = true;
+
+        while (inQuestionMenu) {
+            questionMenu();
+
+            try {
+                int option = scanner.nextInt();
+                scanner.nextLine();
+                switch (option) {
+                    case 1 -> showQuestions();
+                    case 2 -> addQuestion();
+                    case 3 -> deleteQuestion();
+                    case 4 -> System.out.println("Not working");
+                    case 0 -> inQuestionMenu = false;
                     default -> System.out.println("Invalid option. Please try again.");
                 }
             } catch (InputMismatchException e) {
@@ -225,6 +253,132 @@ public class MyApplication {
             scanner.next();
         } catch (Exception e) {
             System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+
+
+
+    private void addQuestion() {
+        System.out.println("Select quiz to add a question:");
+
+        List<Quiz> quizzes = quizController.showQuizzes(currentUser.getUser_id());
+        if (quizzes.isEmpty()) {
+            System.out.println("No quizzes available to add questions.");
+            return;
+        }
+
+        for (int i = 0; i < quizzes.size(); i++) {
+            System.out.println((i + 1) + ". " + quizzes.get(i).getQuizName());
+        }
+
+        try {
+            System.out.print("Enter the number of the quiz: ");
+            int quizNumber = scanner.nextInt();
+            scanner.nextLine();
+
+            if (quizNumber > 0 && quizNumber <= quizzes.size()) {
+                int quizId = quizzes.get(quizNumber - 1).getQuizId();
+
+                System.out.print("Enter question text: ");
+                String questionText = scanner.nextLine();
+
+                Question question = new Question(questionText, quizId);
+                String response = questionController.addQuestion(question);
+                System.out.println(response);
+            } else {
+                System.out.println("Invalid quiz number.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Input must be an integer.");
+            scanner.next();
+        }
+    }
+
+    private void showQuestions() {
+        System.out.println("Select quiz to view questions:");
+
+        List<Quiz> quizzes = quizController.showQuizzes(currentUser.getUser_id());
+        if (quizzes.isEmpty()) {
+            System.out.println("No quizzes available.");
+            return;
+        }
+
+        for (int i = 0; i < quizzes.size(); i++) {
+            System.out.println((i + 1) + ". " + quizzes.get(i).getQuizName());
+        }
+
+        try {
+            System.out.print("Enter the number of the quiz: ");
+            int quizNumber = scanner.nextInt();
+            scanner.nextLine();
+
+            if (quizNumber > 0 && quizNumber <= quizzes.size()) {
+                int quizId = quizzes.get(quizNumber - 1).getQuizId();
+
+                List<Question> questions = questionController.getQuestionsByQuiz(quizId);
+                if (questions.isEmpty()) {
+                    System.out.println("No questions found for this quiz.");
+                } else {
+                    System.out.println("Questions:");
+                    questions.forEach(q -> System.out.println("- " + q.getQuestionText()));
+                }
+            } else {
+                System.out.println("Invalid quiz number.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Input must be an integer.");
+            scanner.next();
+        }
+    }
+
+    private void deleteQuestion() {
+        System.out.println("Select quiz to delete a question:");
+
+        List<Quiz> quizzes = quizController.showQuizzes(currentUser.getUser_id());
+        if (quizzes.isEmpty()) {
+            System.out.println("No quizzes available.");
+            return;
+        }
+
+        for (int i = 0; i < quizzes.size(); i++) {
+            System.out.println((i + 1) + ". " + quizzes.get(i).getQuizName());
+        }
+
+        try {
+            System.out.print("Enter the number of the quiz: ");
+            int quizNumber = scanner.nextInt();
+            scanner.nextLine();
+
+            if (quizNumber > 0 && quizNumber <= quizzes.size()) {
+                int quizId = quizzes.get(quizNumber - 1).getQuizId();
+
+                List<Question> questions = questionController.getQuestionsByQuiz(quizId);
+                if (questions.isEmpty()) {
+                    System.out.println("No questions found for this quiz.");
+                    return;
+                }
+
+                for (int i = 0; i < questions.size(); i++) {
+                    System.out.println((i + 1) + ". " + questions.get(i).getQuestionText());
+                }
+
+                System.out.print("Enter the number of the question to delete: ");
+                int questionNumber = scanner.nextInt();
+                scanner.nextLine();
+
+                if (questionNumber > 0 && questionNumber <= questions.size()) {
+                    int questionId = questions.get(questionNumber - 1).getQuestionId();
+                    String response = questionController.deleteQuestion(questionId);
+                    System.out.println(response);
+                } else {
+                    System.out.println("Invalid question number.");
+                }
+            } else {
+                System.out.println("Invalid quiz number.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Input must be an integer.");
+            scanner.next();
         }
     }
 
