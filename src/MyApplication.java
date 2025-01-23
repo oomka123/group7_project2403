@@ -1,6 +1,7 @@
 import controllers.AuthController;
 import controllers.QuestionController;
 import controllers.QuizController;
+import controllers.AnswerController;
 
 import models.*;
 
@@ -10,14 +11,16 @@ public class MyApplication {
     private final AuthController authController;
     private final QuizController quizController;
     private final QuestionController questionController;
+    private final AnswerController answerController;
     private final Scanner scanner;
     private User currentUser;
 
-    public MyApplication(AuthController authController, QuizController quizController, QuestionController questionController) {
+    public MyApplication(AuthController authController, QuizController quizController, QuestionController questionController, AnswerController answerController) {
         this.scanner = new Scanner(System.in);
         this.authController = authController;
         this.quizController = quizController;
         this.questionController = questionController;
+        this.answerController = answerController;
     }
 
     private void mainMenu() {
@@ -50,10 +53,20 @@ public class MyApplication {
         System.out.println("1. View Questions");
         System.out.println("2. Add Question");
         System.out.println("3. Delete Question");
-        System.out.println("4. Manage Answers(not working)");
+        System.out.println("4. Manage Answers");
         System.out.println("0. Back");
         System.out.print("Enter your choice: ");
     }
+
+    private void answerMenu() {
+        System.out.println("\n=== Answer Menu ===");
+        System.out.println("1. View Answers");
+        System.out.println("2. Add Answer");
+        System.out.println("3. Delete Answer");
+        System.out.println("0. Back");
+        System.out.print("Enter your choice: ");
+    }
+
 
     public void start() {
         boolean running = true;
@@ -139,7 +152,7 @@ public class MyApplication {
                     case 1 -> showQuestions();
                     case 2 -> addQuestion();
                     case 3 -> deleteQuestion();
-                    case 4 -> System.out.println("Not working");
+                    case 4 -> handleAnswerMenu();
                     case 0 -> inQuestionMenu = false;
                     default -> System.out.println("Invalid option. Please try again.");
                 }
@@ -153,6 +166,29 @@ public class MyApplication {
         }
     }
 
+    private void handleAnswerMenu() {
+        while (true) {
+            answerMenu();
+
+            try {
+                int option = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (option) {
+                    case 1 -> viewAnswers();
+                    case 2 -> addAnswer();
+                    case 3 -> deleteAnswer();
+                    case 0 -> {
+                        return;
+                    }
+                    default -> System.out.println("Invalid option. Please try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Input must be an integer. " + e.getMessage());
+                scanner.next();
+            }
+        }
+    }
 
     public void getRegistration() {
         try {
@@ -379,6 +415,130 @@ public class MyApplication {
         } catch (InputMismatchException e) {
             System.out.println("Input must be an integer.");
             scanner.next();
+        }
+    }
+
+
+
+    private void viewAnswers() {
+        List<Question> questions = getQuestionsForCurrentUser();
+        if (questions.isEmpty()) {
+            System.out.println("No questions available.");
+            return;
+        }
+
+        displayQuestions(questions);
+        System.out.print("Enter the number of the question to view answers: ");
+        int questionIndex = scanner.nextInt();
+        scanner.nextLine();
+
+        if (questionIndex > 0 && questionIndex <= questions.size()) {
+            int questionId = questions.get(questionIndex - 1).getQuestionId();
+            List<Answer> answers = answerController.getAnswersByQuestion(questionId);
+            if (answers.isEmpty()) {
+                System.out.println("No answers found for this question.");
+            } else {
+                System.out.println("Answers:");
+                answers.forEach(a -> System.out.println("- " + a.getAnswerText() + " (Correct: " + a.isCorrectAnswer() + ")"));
+            }
+        } else {
+            System.out.println("Invalid question number.");
+        }
+    }
+
+    private void addAnswer() {
+        List<Question> questions = getQuestionsForCurrentUser();
+        if (questions.isEmpty()) {
+            System.out.println("No questions available.");
+            return;
+        }
+
+        displayQuestions(questions);
+        System.out.print("Enter the number of the question to add an answer: ");
+        int questionIndex = scanner.nextInt();
+        scanner.nextLine();
+
+        if (questionIndex > 0 && questionIndex <= questions.size()) {
+            int questionId = questions.get(questionIndex - 1).getQuestionId();
+            System.out.print("Enter answer text: ");
+            String answerText = scanner.nextLine();
+            System.out.print("Is this answer correct? (true/false): ");
+            boolean isCorrect = scanner.nextBoolean();
+            scanner.nextLine();
+
+            Answer answer = new Answer(0, answerText, isCorrect, questionId);
+            if (answerController.addAnswer(answer)) {
+                System.out.println("Answer added successfully.");
+            } else {
+                System.out.println("Failed to add answer.");
+            }
+        } else {
+            System.out.println("Invalid question number.");
+        }
+    }
+
+    private void deleteAnswer() {
+        List<Question> questions = getQuestionsForCurrentUser();
+        if (questions.isEmpty()) {
+            System.out.println("No questions available.");
+            return;
+        }
+
+        displayQuestions(questions);
+        System.out.print("Enter the number of the question to delete an answer: ");
+        int questionIndex = scanner.nextInt();
+        scanner.nextLine();
+
+        if (questionIndex > 0 && questionIndex <= questions.size()) {
+            int questionId = questions.get(questionIndex - 1).getQuestionId();
+            List<Answer> answers = answerController.getAnswersByQuestion(questionId);
+
+            if (answers.isEmpty()) {
+                System.out.println("No answers found for this question.");
+                return;
+            }
+
+            System.out.println("Answers:");
+            for (int i = 0; i < answers.size(); i++) {
+                Answer answer = answers.get(i);
+                System.out.println((i + 1) + ". " + answer.getAnswerText() + " (Correct: " + answer.isCorrectAnswer() + ")");
+            }
+
+            System.out.print("Enter the number of the answer to delete: ");
+            int answerIndex = scanner.nextInt();
+            scanner.nextLine();
+
+            if (answerIndex > 0 && answerIndex <= answers.size()) {
+                int answerId = answers.get(answerIndex - 1).getAnswerId();
+                if (answerController.deleteAnswer(answerId)) {
+                    System.out.println("Answer deleted successfully.");
+                } else {
+                    System.out.println("Failed to delete answer.");
+                }
+            } else {
+                System.out.println("Invalid answer number.");
+            }
+        } else {
+            System.out.println("Invalid question number.");
+        }
+    }
+
+    private List<Question> getQuestionsForCurrentUser() {
+        List<Quiz> quizzes = quizController.showQuizzes(currentUser.getUser_id());
+        List<Question> allQuestions = new ArrayList<>();
+
+        for (Quiz quiz : quizzes) {
+            allQuestions.addAll(questionController.getQuestionsByQuiz(quiz.getQuizId()));
+        }
+
+        return allQuestions;
+    }
+
+    private void displayQuestions(List<Question> questions) {
+        System.out.println("Questions:");
+        for (int i = 0; i < questions.size(); i++) {
+            Question question = questions.get(i);
+            System.out.println((i + 1) + ". " + question.getQuestionText());
         }
     }
 
