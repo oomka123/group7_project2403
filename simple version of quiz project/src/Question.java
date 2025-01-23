@@ -41,7 +41,7 @@ public class Question {
 
         for (int i = 0; i < shuffledOptions.size(); i++) {
             if (shuffledOptions.get(i).equalsIgnoreCase(correctText)) {
-                return String.valueOf((char) ('A' + i)); // Return "A", "B", "C", or "D"
+                return String.valueOf((char) ('A' + i)); 
             }
         }
         return null;
