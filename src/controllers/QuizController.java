@@ -1,32 +1,36 @@
 package controllers;
 
 import java.util.List;
+
 import models.Quiz;
-import repositories.QuizRepository;
+import services.QuizService;
 
 public class QuizController {
-    private final QuizRepository quizRepo;
+    private final QuizService quizService;
 
-    public QuizController(QuizRepository quizRepo) {
-        this.quizRepo = quizRepo;
+    public QuizController(QuizService quizService) {
+        this.quizService = quizService;
+    }
+
+    public List<Quiz> getQuizzesByUser(int userId) {
+        try {
+            return quizService.getQuizzesByUser(userId);
+        } catch (Exception e) {
+            System.out.println("Error fetching questions: " + e.getMessage());
+            return List.of();
+        }
     }
 
     public String createQuiz(String quizName, int userId) {
-
-        Quiz quiz = new Quiz(quizName, userId);
-
-        boolean success = this.quizRepo.quizCreation(quiz, userId);
-
-        return success ? "Quiz creation successful!" : "Quiz creation failed. Please try again.";
+        return this.quizService.createQuiz(new Quiz(quizName, userId));
     }
 
     public List<Quiz> showQuizzes(int userId) {
-        return quizRepo.quizShowing(userId);
+        return quizService.getQuizzesByUser(userId);
     }
 
     public String deleteQuiz(int quizId) {
-        boolean success = this.quizRepo.quizDelete(quizId);
-        return success ? "Quiz deleted successfully!" : "Failed to delete quiz. Please try again.";
+        return this.quizService.deleteQuiz(quizId);
     }
 
 }

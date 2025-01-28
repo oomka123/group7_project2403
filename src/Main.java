@@ -1,17 +1,20 @@
-import controllers.AuthController;
-import controllers.QuizController;
-import controllers.QuestionController;
 import controllers.AnswerController;
-
+import controllers.AuthController;
+import controllers.QuestionController;
+import controllers.QuizController;
 import database.PostgresDB;
-
-import repositories.UserRepository;
-import repositories.QuizRepository;
-import repositories.QuestionRepository;
 import repositories.AnswerRepository;
+import repositories.QuestionRepository;
+import repositories.QuizRepository;
+import repositories.UserRepository;
+import services.AnswerService;
+import services.QuestionService;
+import services.QuizService;
+import services.UserService;
 
 public class Main {
     public static void main(String[] args) {
+
         String host = "jdbc:postgresql://localhost:5432";
         String username = "postgres";
         String password = "0000";
@@ -24,13 +27,17 @@ public class Main {
         QuestionRepository questionRepo = new QuestionRepository(db);
         AnswerRepository answerRepo = new AnswerRepository(db);
 
-        AuthController authController = new AuthController(userRepo);
-        QuizController quizController = new QuizController(quizRepo);
-        QuestionController questionController = new QuestionController(questionRepo);
-        AnswerController answerController = new AnswerController(answerRepo);
+        UserService userService = new UserService(userRepo);
+        QuizService quizService = new QuizService(quizRepo);
+        QuestionService questionService = new QuestionService(questionRepo);
+        AnswerService answerService = new AnswerService(answerRepo);
+
+        AuthController authController = new AuthController(userService);
+        QuizController quizController = new QuizController(quizService);
+        QuestionController questionController = new QuestionController(questionService);
+        AnswerController answerController = new AnswerController(answerService);
 
         MyApplication app = new MyApplication(authController, quizController, questionController, answerController);
         app.start();
-
     }
 }
