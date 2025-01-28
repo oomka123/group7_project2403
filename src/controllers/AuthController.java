@@ -1,23 +1,20 @@
 package controllers;
 
 import models.User;
-import repositories.UserRepository;
+import services.UserService;
 
 public class AuthController {
-    private UserRepository userRepo;
+    private UserService userService;
 
-    public AuthController(UserRepository userRepo) {
-        this.userRepo = userRepo;
+    public AuthController(UserService userService) {
+        this.userService = userService;
     }
 
     public String registerUser(String username, String password) {
-        User user = new User(username, password);
-        boolean success = this.userRepo.userRegistration(user);
-        return success ? "Registration successful!" : "Registration failed. Username may already exist.";
+        return this.userService.registerUser(username, password);
     }
 
     public User loginUser(String username, String password) {
-        User user = userRepo.userLogin(username, password);
-        return user;
+        return userService.loginUser(username, password);
     }
 }
