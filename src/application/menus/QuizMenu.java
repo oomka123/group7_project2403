@@ -1,6 +1,5 @@
 package application.menus;
 
-import enums.RoleCategory;
 import models.User;
 
 public class QuizMenu {

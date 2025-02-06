@@ -1,6 +1,5 @@
 package controllers;
 
-import database.PostgresDB;
 import models.Question;
 import repositories.QuestionRepository;
 

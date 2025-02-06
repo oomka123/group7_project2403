@@ -1,15 +1,15 @@
 package repositories;
 
-import database.PostgresDB;
+import database.PostgresDB1;
 import models.Question;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionRepository {
-    private final PostgresDB db;
+    private final PostgresDB1 db;
 
-    public QuestionRepository(PostgresDB db) {
+    public QuestionRepository(PostgresDB1 db) {
         this.db = db;
     }
 

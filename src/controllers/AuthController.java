@@ -2,7 +2,6 @@ package controllers;
 
 import controllers.Icontollers.IAuthController;
 import models.User;
-import enums.RoleCategory;
 import services.UserService;
 
 import java.util.List;

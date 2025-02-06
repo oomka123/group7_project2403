@@ -1,15 +1,15 @@
 package repositories;
 
-import database.PostgresDB;
+import database.PostgresDB1;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class QuizAttemptRepository {
-    private final PostgresDB db;
+    private final PostgresDB1 db;
 
-    public QuizAttemptRepository(PostgresDB db) {
+    public QuizAttemptRepository(PostgresDB1 db) {
         this.db = db;
     }
 

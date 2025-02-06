@@ -2,7 +2,6 @@ package repositories;
 
 import database.PostgresDB;
 import models.User;
-import enums.RoleCategory;
 import repositories.Irepositories.IUserRepository;
 
 import java.sql.Connection;

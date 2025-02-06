@@ -1,7 +1,7 @@
 package services.Iservices;
 
 import models.User;
-import enums.RoleCategory;
+
 import java.util.List;
 
 public interface IUserService {

@@ -20,7 +20,7 @@ public class Main {
         String password = "0000";
         String dbName = "quiz_app";
 
-        PostgresDB db = new PostgresDB(host, username, password, dbName);
+        PostgresDB db = PostgresDB.getInstance(host, username, password, dbName);
 
         UserRepository userRepo = new UserRepository(db);
         QuizRepository quizRepo = new QuizRepository(db);

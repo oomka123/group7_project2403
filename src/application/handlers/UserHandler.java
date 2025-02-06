@@ -3,7 +3,6 @@ package application.handlers;
 import models.User;
 import controllers.AuthController;
 import controllers.QuizController;
-import enums.RoleCategory;
 
 
 import java.util.Map;

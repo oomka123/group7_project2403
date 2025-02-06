@@ -1,6 +1,6 @@
 package repositories;
 
-import database.PostgresDB;
+import database.PostgresDB1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,9 +8,9 @@ import java.sql.SQLException;
 import models.User;
 
 public class UserRepository {
-    private final PostgresDB db;
+    private final PostgresDB1 db;
 
-    public UserRepository(PostgresDB db) {
+    public UserRepository(PostgresDB1 db) {
         this.db = db;
     }
 

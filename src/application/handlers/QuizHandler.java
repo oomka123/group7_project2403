@@ -3,7 +3,6 @@ package application.handlers;
 import models.Quiz;
 import models.User;
 import controllers.QuizController;
-import enums.QuizCategory;
 
 import java.util.InputMismatchException;
 import java.util.List;

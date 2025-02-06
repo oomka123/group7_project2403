@@ -1,7 +1,5 @@
 package models.Imodels;
 
-import enums.RoleCategory;
-
 public interface IUser {
     int getUserId();
     void setUserId(int userId);

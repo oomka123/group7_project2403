@@ -4,14 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class PostgresDB {
+public class PostgresDB1 {
     private String host;
     private String username;
     private String password;
     private String dbName;
     private Connection connection;
 
-    public PostgresDB(String host, String username, String password, String dbName) {
+    public PostgresDB1(String host, String username, String password, String dbName) {
         this.setHost(host);
         this.setUsername(username);
         this.setPassword(password);
