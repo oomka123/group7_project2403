@@ -1,5 +1,6 @@
 package application.handlers;
 
+import enums.RoleCategory;
 import models.User;
 import controllers.AuthController;
 import controllers.QuizController;
@@ -72,7 +73,7 @@ public class UserHandler {
         System.out.println("List of Users:");
         users.forEach(user -> {
             RoleCategory role = RoleCategory.valueOf(user.getRole().name());
-            int quizCount = quizCounts.getOrDefault(user.getUserId(), 0); // Если квизов нет, ставим 0
+            int quizCount = quizCounts.getOrDefault(user.getUserId(), 0);
 
             if (currentUser.getRole() == RoleCategory.ADMIN) {
                 System.out.println("ID: " + user.getUserId() +

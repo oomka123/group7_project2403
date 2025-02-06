@@ -1,5 +1,6 @@
 package services;
 
+import enums.RoleCategory;
 import models.User;
 import factories.UserFactory;
 import repositories.UserRepository;
@@ -55,13 +56,13 @@ public class UserService implements IUserService {
         RoleCategory roleCategory;
 
         try {
-            roleCategory = RoleCategory.valueOf(newRole.toUpperCase()); // Преобразуем строку в Enum
+            roleCategory = RoleCategory.valueOf(newRole.toUpperCase());
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid role: " + newRole);
             return false;
         }
 
-        boolean success = userRepo.updateUserRole(userId, roleCategory); // Передаём Enum, а не строку
+        boolean success = userRepo.updateUserRole(userId, roleCategory);
         return success;
     }
 

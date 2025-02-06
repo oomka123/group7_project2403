@@ -1,6 +1,7 @@
 package repositories.Irepositories;
 
 import models.User;
+import enums.RoleCategory;
 
 import java.util.List;
 

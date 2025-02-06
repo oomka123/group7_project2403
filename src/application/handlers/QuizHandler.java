@@ -1,5 +1,6 @@
 package application.handlers;
 
+import enums.QuizCategory;
 import models.Quiz;
 import models.User;
 import controllers.QuizController;
@@ -35,7 +36,7 @@ public class QuizHandler {
 
         System.out.print("Enter category number: ");
         int categoryIndex = scanner.nextInt();
-        scanner.nextLine(); // очистка ввода
+        scanner.nextLine();
 
         if (categoryIndex < 1 || categoryIndex > categories.length) {
             System.out.println("Invalid category selection.");
@@ -49,7 +50,7 @@ public class QuizHandler {
     }
 
 
-    public void showQuizzes(User currentUser) { // Передаём currentUser
+    public void showQuizzes(User currentUser) {
         if (currentUser == null) {
             System.out.println("You must be logged in to view quizzes.");
             return;
@@ -68,7 +69,7 @@ public class QuizHandler {
         );
     }
 
-    public void deleteQuiz(User currentUser) { // Передаём currentUser
+    public void deleteQuiz(User currentUser) {
         if (currentUser == null) {
             System.out.println("You must be logged in to delete quizzes.");
             return;

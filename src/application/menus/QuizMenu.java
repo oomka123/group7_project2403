@@ -1,5 +1,6 @@
 package application.menus;
 
+import enums.RoleCategory;
 import models.User;
 
 public class QuizMenu {
@@ -13,7 +14,7 @@ public class QuizMenu {
         System.out.println("4. Delete Quizzes");
         System.out.println("5. Manage Questions");
 
-        // Преобразуем строку роли в Enum
+
         RoleCategory role = RoleCategory.valueOf(currentUser.getRole().name());
 
         if (role == RoleCategory.ADMIN) {

@@ -49,8 +49,6 @@ public class QuestionHandler {
 
                 System.out.print("Enter question text: ");
                 String questionText = scanner.nextLine();
-
-                //Question question = new Question(questionText, quizId);
                 String response = questionController.addQuestion(questionText, quizId);
                 System.out.println(response);
             } else {

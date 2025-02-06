@@ -73,7 +73,7 @@ public class StartQuiz {
             int totalQuestions = questionsWithAnswers.size();
             int correctAnswers = 0;
             List<IncorrectAnswer> incorrectAnswers = new ArrayList<>();
-            // qwe
+
             for (int i = 0; i < totalQuestions; i++) {
                 Question question = questionsWithAnswers.get(i);
                 System.out.println("Question " + (i + 1) + ": " + question.getQuestionText());

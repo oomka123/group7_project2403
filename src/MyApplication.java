@@ -1,3 +1,4 @@
+import application.StartQuiz;
 import controllers.AuthController;
 import controllers.QuestionController;
 import controllers.QuizController;

@@ -1,5 +1,6 @@
 package models;
 
+import enums.RoleCategory;
 import models.Imodels.IUser;
 
 public class User implements IUser {

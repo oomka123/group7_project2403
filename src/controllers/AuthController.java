@@ -1,5 +1,6 @@
 package controllers;
 
+import enums.RoleCategory;
 import controllers.Icontollers.IAuthController;
 import models.User;
 import services.UserService;
@@ -31,11 +32,11 @@ public class AuthController implements IAuthController {
     @Override
     public String updateUserRole(int adminId, int userId, RoleCategory newRole) {
         User admin = userService.getUserById(adminId);
-        if (admin == null || admin.getRole() != RoleCategory.ADMIN) { // Проверяем роль через enum
+        if (admin == null || admin.getRole() != RoleCategory.ADMIN) {
             return "Access denied! Only ADMIN can change roles.";
         }
 
-        boolean updated = userService.updateUserRole(userId, newRole.name()); // Преобразуем Enum в String
+        boolean updated = userService.updateUserRole(userId, newRole.name());
         return updated ? "User role updated successfully!" : "Failed to update role.";
     }
 

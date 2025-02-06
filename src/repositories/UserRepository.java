@@ -3,6 +3,7 @@ package repositories;
 import database.PostgresDB;
 import models.User;
 import repositories.Irepositories.IUserRepository;
+import enums.RoleCategory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -116,7 +117,7 @@ public class UserRepository implements IUserRepository {
         String sql = "UPDATE users SET role = ? WHERE user_id = ?";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-            st.setString(1, newRole.getDisplayName()); // Получаем строковое представление роли
+            st.setString(1, newRole.getDisplayName());
             st.setInt(2, userId);
 
             return st.executeUpdate() > 0;
