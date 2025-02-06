@@ -1,50 +1,77 @@
 package services;
 
 import models.User;
+import factories.UserFactory;
 import repositories.UserRepository;
+import enums.RoleCategory;
+import services.Iservices.IUserService;
 
-public class UserService {
+import java.util.List;
+
+public class UserService implements IUserService {
     private final UserRepository userRepo;
 
     public UserService(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
 
+    @Override
     public String registerUser(String username, String password) {
-        if (username == null || username.trim().isEmpty()) {
-            return "Username cannot be empty.";
+        try {
+            User user = UserFactory.createUser(username, password);
+            if (userRepo.userRegistration(user)) {
+                return "Registration successful!";
+            } else {
+                return "Registration failed. Username may already exist.";
+            }
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
         }
-        if (password == null || password.trim().isEmpty()) {
-            return "Password cannot be empty.";
-        }
-        if (password.length() < 6) {
-            return "Password must be at least 6 characters long.";
-        }
-
-        User user = new User(username.trim(), password);
-
-        boolean success = userRepo.userRegistration(user);
-
-        return success ? "Registration successful!" : "Registration failed. Username may already exist.";
     }
 
-
+    @Override
     public User loginUser(String username, String password) {
-        if (username == null || username.trim().isEmpty()) {
-            System.out.println("Username cannot be empty.");
+        try {
+            User user = UserFactory.createUser(username, password);
+            return userRepo.userLogin(user);
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return null;
         }
-        if (password == null || password.trim().isEmpty()) {
-            System.out.println("Password cannot be empty.");
-            return null;
-        }
-
-        User user = userRepo.userLogin(username, password);
-        if (user == null) {
-            System.out.println("Invalid username or password.");
-        }
-
-        return user;
     }
 
+    @Override
+    public User getUserById(int userId) {
+        return userRepo.getUserById(userId);
+    }
+
+    @Override
+    public String getUserRole(int userId) {
+        return userRepo.getUserRole(userId);
+    }
+
+    @Override
+    public boolean updateUserRole(int userId, String newRole) {
+        RoleCategory roleCategory;
+
+        try {
+            roleCategory = RoleCategory.valueOf(newRole.toUpperCase()); // Преобразуем строку в Enum
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid role: " + newRole);
+            return false;
+        }
+
+        boolean success = userRepo.updateUserRole(userId, roleCategory); // Передаём Enum, а не строку
+        return success;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepo.getAllUsers();
+    }
+
+    public boolean deleteUser(int userId) {
+        return userRepo.deleteUser(userId);
+    }
 }

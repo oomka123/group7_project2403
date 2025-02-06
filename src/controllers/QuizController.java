@@ -1,36 +1,48 @@
 package controllers;
 
-import java.util.List;
-
+import controllers.Icontollers.IQuizController;
+import models.Question;
 import models.Quiz;
 import services.QuizService;
 
-public class QuizController {
+import java.util.List;
+import java.util.Map;
+
+public class QuizController implements IQuizController {
     private final QuizService quizService;
 
     public QuizController(QuizService quizService) {
         this.quizService = quizService;
     }
 
+    @Override
+    public List<Quiz> getQuizzesByCategory(String category) {
+        return quizService.getQuizzesByCategory(category);
+    }
+
+    @Override
+    public Map<Integer, Integer> getQuizCounts() {
+        return quizService.getQuizCounts();
+    }
+
+    @Override
     public List<Quiz> getQuizzesByUser(int userId) {
-        try {
-            return quizService.getQuizzesByUser(userId);
-        } catch (Exception e) {
-            System.out.println("Error fetching questions: " + e.getMessage());
-            return List.of();
-        }
-    }
-
-    public String createQuiz(String quizName, int userId) {
-        return this.quizService.createQuiz(new Quiz(quizName, userId));
-    }
-
-    public List<Quiz> showQuizzes(int userId) {
         return quizService.getQuizzesByUser(userId);
     }
 
+    @Override
+    public String createQuiz(String quizName, String category, int userId) {
+        return quizService.createQuiz(quizName, category, userId);
+    }
+
+    @Override
+    public List<Quiz> showQuizzes(int userId) {
+        return getQuizzesByUser(userId);
+    }
+
+    @Override
     public String deleteQuiz(int quizId) {
-        return this.quizService.deleteQuiz(quizId);
+        return quizService.deleteQuiz(quizId);
     }
 
 }

@@ -2,10 +2,12 @@ package services;
 
 import models.Answer;
 import repositories.AnswerRepository;
+import factories.AnswerFactory;
+import services.Iservices.IAnswerService;
 
 import java.util.List;
 
-public class AnswerService {
+public class AnswerService implements IAnswerService {
 
     private final AnswerRepository answerRepo;
 
@@ -13,6 +15,7 @@ public class AnswerService {
         this.answerRepo = answerRepo;
     }
 
+    @Override
     public List<Answer> getAnswersByQuestion(int questionId) {
         if (questionId <= 0) {
             throw new IllegalArgumentException("Question ID must be greater than 0.");
@@ -20,40 +23,30 @@ public class AnswerService {
         return answerRepo.getAnswersByQuestion(questionId);
     }
 
+    @Override
     public boolean addAnswer(Answer answer) {
-        if (answer == null || answer.getAnswerText() == null || answer.getAnswerText().trim().isEmpty()) {
-            System.out.println("Answer text cannot be null or empty.");
+        try {
+            Answer validatedAnswer = AnswerFactory.createAnswer(answer.getQuestionId(), answer.getAnswerText(), answer.isCorrectAnswer());
+            return answerRepo.addAnswer(validatedAnswer);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error adding answer: " + e.getMessage());
             return false;
         }
-        if (answer.getQuestionId() <= 0) {
-            System.out.println("Invalid question ID.");
-            return false;
-        }
-
-        return answerRepo.addAnswer(answer);
     }
 
+    @Override
     public boolean deleteAnswer(int answerId) {
         if (answerId <= 0) {
-            System.out.println("Invalid answer ID.");
-            return false;
+            throw new IllegalArgumentException("Invalid answer ID.");
         }
 
         return answerRepo.deleteAnswer(answerId);
     }
 
+    @Override
     public boolean updateAnswer(Answer answer) {
-        if (answer == null) {
-            System.out.println("Answer cannot be null.");
-            return false;
-        }
-        if (answer.getAnswerId() <= 0) {
-            System.out.println("Invalid answer ID.");
-            return false;
-        }
-        if (answer.getAnswerText() == null || answer.getAnswerText().trim().isEmpty()) {
-            System.out.println("Answer text cannot be null or empty.");
-            return false;
+        if (answer == null || !answer.isValid()) {
+            throw new IllegalArgumentException("Answer cannot be null or invalid.");
         }
 
         return answerRepo.updateAnswer(answer);

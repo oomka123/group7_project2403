@@ -1,42 +1,71 @@
 package models;
 
-public class User {
-    private int user_id;
-    private String user_name;
-    private String user_password;
+import enums.RoleCategory;
+import models.Imodels.IUser;
 
-    public User(int user_id, String user_name, String user_password) {
-        this.user_id = user_id;
-        this.user_name = user_name;
-        this.user_password = user_password;
+public class User implements IUser {
+    private int userId;
+    private String userName;
+    private String userPassword;
+    private RoleCategory role;
+
+
+    public enum Role {
+        ADMIN, EDITOR, USER
     }
 
-    public User(String user_name, String user_password) {
-        this.user_name = user_name;
-        this.user_password = user_password;
+
+    public User(int userId, String userName, String userPassword, RoleCategory role) {
+        this.userId = userId;
+        this.userName = userName;
+        this.userPassword = userPassword;
+        this.role = role;
     }
 
-    public int getUser_id() {
-        return this.user_id;
+
+    public User(String userName, String userPassword) {
+        this.userName = userName;
+        this.userPassword = userPassword;
+        this.role = RoleCategory.USER;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    @Override
+    public int getUserId() {
+        return userId;
     }
 
-    public String getUser_password() {
-        return this.user_password;
+    @Override
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public void setUser_password(String user_password) {
-        this.user_password = user_password;
+    @Override
+    public String getUserName() {
+        return userName;
     }
 
-    public String getUser_name() {
-        return this.user_name;
+    @Override
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    @Override
+    public String getUserPassword() {
+        return userPassword;
+    }
+
+    @Override
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
+
+    @Override
+    public RoleCategory getRole() {
+        return role;
+    }
+
+    @Override
+    public void setRole(RoleCategory role) {
+        this.role = role;
     }
 }
