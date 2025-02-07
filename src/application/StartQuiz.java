@@ -40,11 +40,20 @@ public class StartQuiz {
         for (int i = 0; i < quizzes.size(); i++) {
             System.out.println((i + 1) + ". " + quizzes.get(i).getQuizName());
         }
+        System.out.println("Enter 0 to exit.");
 
-        int quizIndex = getIntInput("Select a quiz by number: ", 1, quizzes.size());
+        int quizIndex = getIntInput("Select a quiz by number: ", 0, quizzes.size());
+        if (quizIndex == 0) {
+            System.out.println("Exiting quiz selection.");
+            return;
+        }
+
         int quizId = quizzes.get(quizIndex - 1).getQuizId();
-
         boolean restartQuiz;
+        int totalQuestions = 0;
+        int correctAnswers = 0;
+        List<IncorrectAnswer> incorrectAnswers = new ArrayList<>();
+
         do {
             restartQuiz = false;
             List<Question> allQuestions = questionController.getQuestionsByQuiz(quizId);
@@ -68,11 +77,10 @@ public class StartQuiz {
             }
 
             System.out.println("Starting the quiz...");
-
             Collections.shuffle(questionsWithAnswers);
-            int totalQuestions = questionsWithAnswers.size();
-            int correctAnswers = 0;
-            List<IncorrectAnswer> incorrectAnswers = new ArrayList<>();
+            totalQuestions = questionsWithAnswers.size();
+            correctAnswers = 0;
+            incorrectAnswers.clear();
 
             for (int i = 0; i < totalQuestions; i++) {
                 Question question = questionsWithAnswers.get(i);
@@ -84,8 +92,14 @@ public class StartQuiz {
                 for (int j = 0; j < answers.size(); j++) {
                     System.out.println((j + 1) + ". " + answers.get(j).getAnswerText());
                 }
+                System.out.println("Enter 0 to exit.");
 
-                int answerIndex = getIntInput("Enter the number of your answer: ", 1, answers.size());
+                int answerIndex = getIntInput("Enter the number of your answer: ", 0, answers.size());
+                if (answerIndex == 0) {
+                    System.out.println("Exiting quiz early.");
+                    break;
+                }
+
                 Answer userAnswer = answers.get(answerIndex - 1);
 
                 if (userAnswer.isCorrectAnswer()) {
@@ -96,7 +110,6 @@ public class StartQuiz {
                     Answer correctAnswer = answers.stream().filter(Answer::isCorrectAnswer).findFirst().orElse(null);
                     incorrectAnswers.add(new IncorrectAnswer(question, userAnswer, correctAnswer));
                 }
-
                 System.out.println();
             }
 
@@ -109,8 +122,7 @@ public class StartQuiz {
                     for (IncorrectAnswer incorrect : incorrectAnswers) {
                         System.out.println("Question: " + incorrect.getQuestion().getQuestionText());
                         System.out.println("Your Answer: " + incorrect.getUserAnswer().getAnswerText());
-                        System.out.println("Correct Answer: " +
-                                (incorrect.getCorrectAnswer() != null ? incorrect.getCorrectAnswer().getAnswerText() : "No correct answer found."));
+                        System.out.println("Correct Answer: " + (incorrect.getCorrectAnswer() != null ? incorrect.getCorrectAnswer().getAnswerText() : "No correct answer found."));
                         System.out.println();
                     }
                 }
