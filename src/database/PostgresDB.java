@@ -7,7 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class PostgresDB implements IPostgresDB {
-    private static volatile database.PostgresDB instance;
+    private static volatile PostgresDB instance;
     private Connection connection;
 
     private final String host;
@@ -23,11 +23,11 @@ public class PostgresDB implements IPostgresDB {
         this.connection = createConnection();
     }
 
-    public static database.PostgresDB getInstance(String host, String username, String password, String dbName) {
+    public static PostgresDB getInstance(String host, String username, String password, String dbName) {
         if (instance == null) {
-            synchronized (database.PostgresDB.class) {
+            synchronized (PostgresDB.class) {
                 if (instance == null) {
-                    instance = new database.PostgresDB(host, username, password, dbName);
+                    instance = new PostgresDB(host, username, password, dbName);
                 }
             }
         }
