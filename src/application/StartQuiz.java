@@ -1,13 +1,9 @@
 package application;
 
-import models.Answer;
-import models.IncorrectAnswer;
-import models.Question;
-import models.Quiz;
-import controllers.QuizController;
-import controllers.QuestionController;
-import controllers.AnswerController;
-import models.User;
+import controllers.Icontollers.IAnswerController;
+import controllers.Icontollers.IQuestionController;
+import controllers.Icontollers.IQuizController;
+import models.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,20 +12,20 @@ import java.util.Scanner;
 
 public class StartQuiz {
 
-    private final QuizController quizController;
-    private final QuestionController questionController;
-    private final AnswerController answerController;
+    private final IQuizController quizController;
+    private final IQuestionController questionController;
+    private final IAnswerController answerController;
     private final Scanner scanner;
 
-    public StartQuiz(QuizController quizController, QuestionController questionController,
-                     AnswerController answerController, Scanner scanner) {
+    public StartQuiz(IQuizController quizController, IQuestionController questionController,
+                     IAnswerController answerController, Scanner scanner) {
         this.quizController = quizController;
         this.questionController = questionController;
         this.answerController = answerController;
         this.scanner = scanner;
     }
 
-    public void startQuiz(User currentUser) {
+    public void startQuiz(AbstractUser currentUser) {
         List<Quiz> quizzes = quizController.showQuizzes(currentUser.getUserId());
         if (quizzes.isEmpty()) {
             System.out.println("No quizzes available.");
@@ -151,4 +147,5 @@ public class StartQuiz {
             System.out.println("Invalid input. Please enter a number between " + min + " and " + max + ".");
         }
     }
+
 }
