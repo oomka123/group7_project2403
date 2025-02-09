@@ -1,5 +1,6 @@
 package repositories;
 
+import database.Idatabase.IPostgresDB;
 import database.PostgresDB;
 import models.Question;
 import repositories.Irepositories.IQuestionRepository;
@@ -13,9 +14,9 @@ import java.util.List;
 
 public class QuestionRepository implements IQuestionRepository {
 
-    private final PostgresDB db;
+    private final IPostgresDB db;
 
-    public QuestionRepository(PostgresDB db) {
+    public QuestionRepository(IPostgresDB db) {
         this.db = db;
     }
 

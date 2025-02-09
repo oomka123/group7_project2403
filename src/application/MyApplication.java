@@ -1,8 +1,9 @@
-import application.StartQuiz;
-import controllers.AuthController;
-import controllers.QuestionController;
-import controllers.QuizController;
-import controllers.AnswerController;
+package application;
+
+import controllers.Icontollers.IAnswerController;
+import controllers.Icontollers.IUserController;
+import controllers.Icontollers.IQuestionController;
+import controllers.Icontollers.IQuizController;
 
 import application.menus.*;
 import application.handlers.*;
@@ -21,15 +22,15 @@ public class MyApplication {
     private final StartQuiz startQuiz;
 
     private final Scanner scanner;
-    private User currentUser;
+    private AbstractUser currentUser;
 
-    public MyApplication(AuthController authController, QuizController quizController, QuestionController questionController, AnswerController answerController) {
+    public MyApplication(IUserController authController, IQuizController quizController, IQuestionController questionController, IAnswerController answerController) {
         this.scanner = new Scanner(System.in);
         this.quizMenu = new QuizMenu();
         this.userHandler = new UserHandler(authController, quizController,scanner);
         this.quizHandler = new QuizHandler(quizController, scanner);
         this.questionHandler = new QuestionHandler(questionController, quizController, scanner);
-        this.answerHandler = new AnswerHandler(quizController, questionController, answerController, scanner);
+        this.answerHandler = new AnswerHandler(quizController, questionController, answerController, quizHandler, questionHandler, scanner);
         this.startQuiz = new StartQuiz(quizController, questionController, answerController, scanner);
     }
 
@@ -76,6 +77,13 @@ public class MyApplication {
     }
 
     private void quizMenuHandler() {
+
+        if (currentUser == null) {
+            System.out.println("No user logged in. Returning to main menu...");
+            return;
+        }
+
+
         boolean inQuizMenu = true;
 
         while (inQuizMenu) {
@@ -122,8 +130,8 @@ public class MyApplication {
         }
     }
 
-    private void quizMenuHandlerForUser(User selectedUser) {
-        User originalUser = currentUser;
+    private void quizMenuHandlerForUser(AbstractUser selectedUser) {
+        AbstractUser originalUser = currentUser;
         currentUser = selectedUser;
 
         boolean inQuizMenu = true;
@@ -253,7 +261,7 @@ public class MyApplication {
             switch (option) {
                 case 1 -> userHandler.viewAllUsers();
                 case 2 -> {
-                    User selectedUser = userHandler.chooseUser();
+                    AbstractUser selectedUser = userHandler.chooseUser();
                     if (selectedUser != null) {
                         quizMenuHandlerForUser(selectedUser);
                     } else {
